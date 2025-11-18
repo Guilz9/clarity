@@ -3,28 +3,50 @@
 }
 
 :root {
-  color-scheme: dark light;
+  color-scheme: dark;
   font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  --bg: #050608;
-  --surface: #0c0f13;
+  --bg: #010409;
+  --bg-alt: #050b15;
+  --surface: #0b111f;
+  --surface-raised: #111a2c;
   --text: #f8fbff;
-  --muted: #9eb1c7;
+  --muted: #95a9c7;
   --accent: #62f6d6;
-  --outline: rgba(255, 255, 255, 0.12);
+  --accent-soft: rgba(98, 246, 214, 0.18);
+  --outline: rgba(157, 199, 231, 0.24);
+  --glow-primary: linear-gradient(120deg, rgba(98, 246, 214, 0.75), rgba(120, 172, 255, 0.55), rgba(98, 246, 214, 0.75));
+  --violet-dark: #1f1233;
+  --violet-pop: #7a4bff;
+  --violet-bright: #c29bff;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(circle at 25% 0, rgba(98, 246, 214, 0.18), transparent 45%), var(--bg);
+  background: radial-gradient(circle at 25% -5%, var(--accent-soft), transparent 40%), var(--bg);
   color: var(--text);
   display: flex;
   justify-content: center;
   padding: 48px 24px 64px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 10% 20%, rgba(98, 246, 214, 0.07), transparent 45%),
+    radial-gradient(circle at 80% 0, rgba(120, 172, 255, 0.09), transparent 45%);
+  pointer-events: none;
+  filter: blur(50px);
+  opacity: 0.85;
 }
 
 .page {
   width: min(960px, 100%);
+  position: relative;
+  z-index: 1;
 }
 
 nav {
@@ -47,19 +69,34 @@ nav a {
   text-decoration: none;
   font-size: 0.95rem;
   opacity: 0.8;
+  border-bottom: 1px solid transparent;
+  transition: opacity 150ms ease, border-color 150ms ease;
 }
 
 nav a:hover {
   opacity: 1;
+  border-color: var(--accent);
 }
 
 .hero {
   background: var(--surface);
   border: 1px solid var(--outline);
-  border-radius: 18px;
+  border-radius: 22px;
   padding: 48px;
   margin-bottom: 40px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: -40% -10%;
+  background: radial-gradient(circle at 25% 25%, rgba(98, 246, 214, 0.2), transparent 45%);
+  opacity: 0.6;
+  filter: blur(60px);
+  pointer-events: none;
 }
 
 .hero h1 {
@@ -81,6 +118,67 @@ nav a:hover {
   gap: 16px;
 }
 
+.hero-command {
+  margin-top: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 26px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(120deg, rgba(122, 75, 255, 0.25), rgba(43, 18, 86, 0.85));
+  color: var(--text);
+  font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, monospace;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  position: relative;
+  overflow: hidden;
+  text-transform: lowercase;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.hero-command::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(194, 155, 255, 0.3), rgba(122, 75, 255, 0.05), rgba(194, 155, 255, 0.3));
+  mix-blend-mode: screen;
+  animation: hero-shimmer 5s linear infinite;
+  opacity: 0.7;
+  z-index: 0;
+}
+
+.hero-command::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(32, 15, 45, 0.96), rgba(27, 11, 42, 0.92));
+  z-index: -1;
+}
+
+.hero-command span {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.hero-command__prompt {
+  font-size: 1.2rem;
+  color: var(--accent);
+  text-shadow: 0 0 12px rgba(98, 246, 214, 0.75);
+}
+
+.hero-command__cursor {
+  width: 12px;
+  height: 2px;
+  background: var(--violet-bright);
+  animation: cursor-blink 1.2s steps(2) infinite;
+  margin-left: 8px;
+}
+
 .button {
   border: 1px solid transparent;
   border-radius: 999px;
@@ -88,12 +186,13 @@ nav a:hover {
   font-size: 1rem;
   font-weight: 600;
   text-decoration: none;
-  transition: transform 150ms ease, border-color 150ms ease;
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .button.primary {
   background: var(--accent);
   color: #021c1a;
+  box-shadow: 0 15px 35px rgba(98, 246, 214, 0.35);
 }
 
 .button.secondary {
@@ -107,10 +206,11 @@ nav a:hover {
 
 .section {
   border: 1px solid var(--outline);
-  border-radius: 18px;
+  border-radius: 20px;
   padding: 32px;
   margin-bottom: 28px;
-  background: rgba(12, 15, 19, 0.72);
+  background: linear-gradient(145deg, rgba(11, 17, 31, 0.95), rgba(8, 12, 22, 0.95));
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
 }
 
 .section h2 {
@@ -128,10 +228,34 @@ nav a:hover {
 }
 
 .card {
-  border: 1px solid var(--outline);
-  border-radius: 16px;
+  position: relative;
+  border-radius: 18px;
   padding: 20px;
-  background: rgba(5, 6, 8, 0.8);
+  background: var(--surface-raised);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -2;
+}
+
+.card::before {
+  background: var(--glow-primary);
+  opacity: 0.7;
+  animation: border-glow 6s linear infinite;
+  filter: blur(4px);
+}
+
+.card::after {
+  inset: 1px;
+  background: var(--surface-raised);
+  z-index: -1;
 }
 
 .card h3 {
@@ -148,10 +272,12 @@ nav a:hover {
 blockquote {
   margin: 0;
   border-left: 3px solid var(--accent);
-  padding-left: 16px;
   color: var(--muted);
   line-height: 1.6;
   font-size: 1rem;
+  background: rgba(9, 14, 24, 0.6);
+  border-radius: 12px;
+  padding: 18px 18px 18px 24px;
 }
 
 footer {
@@ -159,6 +285,129 @@ footer {
   margin-top: 40px;
   color: var(--muted);
   font-size: 0.85rem;
+}
+
+@keyframes border-glow {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateX(-25%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes hero-shimmer {
+  0% {
+    transform: translateX(-30%);
+  }
+  100% {
+    transform: translateX(30%);
+  }
+}
+
+@keyframes cursor-blink {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.social-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+.social-preview__card {
+  border-radius: 24px;
+  padding: 28px;
+  background: var(--surface-raised);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+}
+
+.social-preview__card h3 {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+}
+
+.social-preview__card p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.social-preview__card ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.social-preview__card li {
+  margin-bottom: 6px;
+}
+
+.social-preview__card li:last-child {
+  margin-bottom: 0;
+}
+
+.social-preview__mock {
+  border-radius: 24px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(140deg, rgba(10, 18, 32, 0.95), rgba(5, 10, 20, 0.95));
+  position: relative;
+  overflow: hidden;
+}
+
+.social-preview__mock::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: repeating-linear-gradient(120deg, rgba(98, 246, 214, 0.06) 0 2px, transparent 2px 6px);
+  opacity: 0.4;
+  animation: scan 12s linear infinite;
+}
+
+.social-preview__mock h4 {
+  margin: 0 0 8px;
+  letter-spacing: 0.1em;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.social-preview__mock p {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--text);
+}
+
+.social-preview__meta {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 @media (max-width: 640px) {
@@ -170,5 +419,15 @@ footer {
   .hero,
   .section {
     padding: 28px;
+  }
+
+  .hero-command {
+    font-size: 0.9rem;
+    padding: 14px 20px;
+    gap: 10px;
+  }
+
+  .social-preview {
+    grid-template-columns: 1fr;
   }
 }
