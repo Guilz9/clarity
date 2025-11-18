@@ -1,120 +1,607 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Clarity · Calm terminal blocks</title>
-    <meta name="description" content="Clarity wraps any terminal command, keeps the logs, and hands back a focused block with next steps." />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Clarity · Calm terminal blocks" />
-    <meta property="og:description" content="Clarity wraps any terminal command, keeps the logs, and hands back a focused block with next steps." />
-    <meta property="og:url" content="https://ruidosujeira.github.io/clarity/" />
-    <meta property="og:image" content="https://raw.githubusercontent.com/ruidosujeira/clarity/main/assets/clarity-banner.png" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Clarity · Calm terminal blocks" />
-    <meta name="twitter:description" content="Clarity wraps any terminal command, keeps the logs, and hands back a focused block with next steps." />
-    <meta name="twitter:image" content="https://raw.githubusercontent.com/ruidosujeira/clarity/main/assets/clarity-banner.png" />
-    <link rel="stylesheet" href="style.css" />
+    <title>Clarity · o mesmo comando, só que legível</title>
+    <meta name="description" content="Clarity é um wrapper minimalista que deixa qualquer CLI legível e sem gritaria." />
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Space Grotesk", "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+        --bg: #050608;
+        --bg-alt: #0b0f16;
+        --panel: #0f141d;
+        --panel-soft: rgba(12, 18, 28, 0.9);
+        --text: #f5f7fb;
+        --muted: #9daabd;
+        --accent: #5ccfe6;
+        --accent-soft: rgba(92, 207, 230, 0.25);
+        --accent-strong: #7fd3ff;
+        --success: #7ad3bf;
+        --warning: #f5c06a;
+        --outline: rgba(124, 150, 185, 0.35);
+        --shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+        --radius: 10px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at 20% -20%, rgba(92, 207, 230, 0.15), transparent 45%),
+          radial-gradient(circle at 80% 0%, rgba(127, 211, 255, 0.1), transparent 35%),
+          var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        letter-spacing: -0.02em;
+        padding-top: 90px;
+        scroll-behavior: smooth;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(120deg, rgba(92, 207, 230, 0.08), rgba(5, 6, 8, 0.4));
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      .nav-shell {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 10;
+        transition: background 200ms ease, border-color 200ms ease;
+      }
+
+      .nav-shell.scrolled {
+        background: rgba(5, 6, 8, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+
+      nav {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 20px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.95rem;
+      }
+
+      .brand {
+        font-size: 1rem;
+        letter-spacing: 0.1em;
+        text-transform: lowercase;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+      }
+
+      .brand span {
+        display: inline-flex;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        background: rgba(92, 207, 230, 0.18);
+        color: var(--accent);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 24px;
+      }
+
+      .nav-links a {
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      .nav-links a:hover {
+        color: var(--accent);
+      }
+
+      main {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 0 32px 120px;
+      }
+
+      section {
+        margin-bottom: 100px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 48px;
+        align-items: center;
+      }
+
+      h1 {
+        font-size: clamp(2.4rem, 5vw, 3.6rem);
+        margin: 0 0 20px;
+        line-height: 1.1;
+      }
+
+      p {
+        margin: 0 0 16px;
+        color: var(--muted);
+      }
+
+      .hero-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .btn {
+        border: 1px solid transparent;
+        border-radius: 999px;
+        padding: 12px 24px;
+        font-weight: 600;
+        text-decoration: none;
+        color: var(--text);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #02161b;
+        box-shadow: 0 30px 60px rgba(92, 207, 230, 0.25);
+      }
+
+      .btn-secondary {
+        border-color: var(--outline);
+        color: var(--accent-strong);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .terminal-card {
+        background: var(--panel);
+        border-radius: var(--radius);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        box-shadow: var(--shadow);
+        padding: 0;
+        overflow: hidden;
+        animation: float-up 600ms ease;
+      }
+
+      .terminal-tabs {
+        display: flex;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .terminal-tab {
+        flex: 1;
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        padding: 14px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: color 0.2s ease, background 0.2s ease;
+      }
+
+      .terminal-tab.active {
+        color: var(--accent);
+        background: rgba(92, 207, 230, 0.08);
+      }
+
+      .terminal-body {
+        padding: 24px 28px;
+        font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+        font-size: 0.9rem;
+        min-height: 320px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 40%);
+      }
+
+      .terminal-panel {
+        display: none;
+        margin: 0;
+        color: var(--text);
+        white-space: pre-wrap;
+      }
+
+      .terminal-panel.active {
+        display: block;
+      }
+
+      .section-title {
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 24px;
+      }
+
+      .grid.cols-4 {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .grid.cols-3 {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+
+      .grid.cols-2 {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+
+      .card {
+        background: var(--panel-soft);
+        border-radius: var(--radius);
+        padding: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        box-shadow: var(--shadow);
+        transition: transform 200ms ease, border-color 200ms ease;
+      }
+
+      .card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(92, 207, 230, 0.4);
+      }
+
+      .card small {
+        font-family: "JetBrains Mono", monospace;
+        color: var(--accent-strong);
+        display: inline-block;
+        margin-bottom: 12px;
+        letter-spacing: 0.08em;
+      }
+
+      .card strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 1.15rem;
+      }
+
+      .steps {
+        counter-reset: steps;
+      }
+
+      .step {
+        counter-increment: steps;
+        position: relative;
+        padding-left: 60px;
+        min-height: 80px;
+      }
+
+      .step::before {
+        content: counter(steps);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(92, 207, 230, 0.15);
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+      }
+
+      pre {
+        margin: 0;
+        border-radius: var(--radius);
+        background: #040507;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 24px;
+        font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+        font-size: 0.95rem;
+        overflow-x: auto;
+      }
+
+      code {
+        font-family: inherit;
+      }
+
+      .examples {
+        display: grid;
+        gap: 20px;
+      }
+
+      .example-pair {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+
+      .example-block {
+        background: rgba(8, 10, 14, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius);
+        padding: 18px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.85rem;
+      }
+
+      .example-label {
+        color: var(--muted);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+      }
+
+      .cta-final {
+        text-align: center;
+        padding: 60px;
+        background: linear-gradient(120deg, rgba(92, 207, 230, 0.07), rgba(2, 5, 8, 0.95));
+        border-radius: var(--radius);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: var(--shadow);
+      }
+
+      footer {
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 40px;
+      }
+
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      @keyframes float-up {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 720px) {
+        nav {
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .hero-buttons {
+          width: 100%;
+        }
+
+        .hero-buttons .btn {
+          flex: 1;
+          justify-content: center;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div class="page">
+    <header class="nav-shell" id="topo">
       <nav>
-        <span class="brand">CLΛRITY</span>
-        <a href="https://github.com/ruidosujeira/clarity" target="_blank" rel="noreferrer">View on GitHub →</a>
+        <div class="brand"><span>λ</span>clarity</div>
+        <div class="nav-links">
+          <a href="#sobre">Sobre</a>
+          <a href="#exemplo">Exemplo</a>
+          <a href="#instalacao">Instalação</a>
+          <a href="https://github.com/ruidosujeira/clarity" target="_blank" rel="noreferrer">GitHub</a>
+        </div>
       </nav>
+    </header>
 
-      <header class="hero">
-        <h1>Less noise, more signal.</h1>
-        <p>
-          Clarity executes the real command, captures stdout/stderr in <code>~/.clarity/logs</code>,
-          and returns a calm block with status, warnings, and next steps. Keep using npm, git,
-          docker, or anything else—just without the wall of text.
-        </p>
-        <div class="cta">
-          <a class="button primary" href="https://www.npmjs.com/package/clarityterm" target="_blank" rel="noreferrer">Install from npm</a>
-          <a class="button secondary" href="https://github.com/ruidosujeira/clarity#tldr" target="_blank" rel="noreferrer">Quick docs</a>
+    <main>
+      <section class="hero" id="sobre">
+        <div>
+          <h1>Clarity: um modo calmo de ver seus comandos.</h1>
+          <p>
+            Clarity não substitui <code>npm</code>, <code>git</code> ou <code>docker</code>. Ele só envolve o comando,
+            captura o log, remove o ruído e devolve um bloco resumido com causa + próximo passo.
+          </p>
+          <p>
+            O mesmo comando de sempre, só que legível. Se precisar do caos completo, rode com
+            <code>--full</code> e pronto.
+          </p>
+          <div class="hero-buttons">
+            <a class="btn btn-primary" href="#instalacao">Instalar Clarity</a>
+            <a class="btn btn-secondary" href="https://github.com/ruidosujeira/clarity" target="_blank" rel="noreferrer">Ver no GitHub</a>
+          </div>
         </div>
-        <div class="hero-command">
-          <span class="hero-command__prompt">Λ</span>
-          <span>clarity npm install --profile calm</span>
-          <span class="hero-command__cursor"></span>
-        </div>
-      </header>
+        <div class="terminal-card" id="exemplo">
+          <div class="terminal-tabs">
+            <button class="terminal-tab active" data-panel="original">npm (original)</button>
+            <button class="terminal-tab" data-panel="clarity">npm com Clarity</button>
+          </div>
+          <div class="terminal-body">
+            <pre class="terminal-panel active" data-panel="original">npm install
 
-      <section class="section">
-        <h2>Signal in practice</h2>
-        <blockquote>
-          Λ_ clarity npm install<br />
-          ✔ Install complete · 42 muted lines · try <code>--details</code> for a preview.<br />
-          <small>Logs saved to <code>~/.clarity/logs</code></small>
-        </blockquote>
+added 234 packages, and audited 1512 packages in 23s
+
+12 packages are looking for funding
+  run `npm fund` for details
+
+npm WARN deprecated left-pad@1.3.0: use something else
+npm WARN optional dep failed...
+npm WARN optional dep failed...
+npm WARN deprecated fsevents@1.2.7: ...
+error ERESOLVE: unable to resolve dependency tree
+...</pre>
+            <pre class="terminal-panel" data-panel="clarity">clarity npm install
+
+✓ 234 pacotes instalados em 23s
+! 1 conflito de dependência
+
+Detalhes:
+- ERESOLVE: árvore de dependências inconsistente
+
+Próximo passo:
+→ rode `npm ls <pacote>` ou ajuste as versões no package.json
+
+(use --full para ver o log bruto)</pre>
+          </div>
+        </div>
       </section>
 
-      <section class="section">
-        <h2>Why Clarity?</h2>
-        <div class="features">
+      <section>
+        <h2 class="section-title">O que o Clarity faz?</h2>
+        <div class="grid cols-4">
           <article class="card">
-            <h3>Smart summaries</h3>
-            <p>Plugins for npm, git, docker, bun, go, rust, and more recognize patterns and spotlight what matters.</p>
+            <small>&gt;</small>
+            <strong>Menos ruído</strong>
+            <p>Agrupa warnings repetidos e deixa um badge indicando quantos foram silenciados.</p>
           </article>
           <article class="card">
-            <h3>Logs first</h3>
-            <p>Every run gets a timestamped file. Open it with <code>clarity logs --open</code>, send to your pager, or jump into your editor.</p>
+            <small>✓</small>
+            <strong>Resumo humano</strong>
+            <p>Transforma logs em poucas linhas com contexto, status e próximo passo explícito.</p>
           </article>
           <article class="card">
-            <h3>Profiles on demand</h3>
-            <p>Toggle between the restrained <code>calm</code> persona and the assertive <code>devops</code> mode with <code>--profile</code>.</p>
+            <small>!</small>
+            <strong>Sem magia</strong>
+            <p>Executa o comando real, preserva exit code e não mexe no PATH. É só um wrapper.</p>
           </article>
           <article class="card">
-            <h3>No lock-in</h3>
-            <p>The original command and exit code stay intact. Need the full stream? Run with <code>--full</code> or <code>--raw</code>.</p>
+            <small>≡</small>
+            <strong>Log completo</strong>
+            <p><code>clarity run --full</code> despeja a saída original sempre que você quiser.</p>
           </article>
         </div>
       </section>
 
-      <section class="section">
-        <h2>Up and running in 60s</h2>
-        <pre><code>npm install -g clarityterm
+      <section>
+        <h2 class="section-title">Como funciona?</h2>
+        <div class="grid cols-3 steps">
+          <article class="card step">
+            <strong>Troque o prefixo</strong>
+            <p>Faça <code>clarity npm install</code> em vez de <code>npm install</code>. Nada mais.</p>
+          </article>
+          <article class="card step">
+            <strong>Clarity captura e organiza</strong>
+            <p>O stdout/stderr é salvo, deduplicado e condensado em um bloco calmo.</p>
+          </article>
+          <article class="card step">
+            <strong>Você escolhe o nível</strong>
+            <p>Fique no resumo, abra quick previews ou despeje tudo com <code>--full</code>.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="instalacao">
+        <h2 class="section-title">Instalação</h2>
+        <pre><code># instale globalmente
+npm install -g clarityterm
+
+# use como prefixo
 clarity npm install
-clarity logs --limit 3 --open</code></pre>
-        <p>Contributing? Clone the repo, run <code>npm install</code>, and use <code>npm link</code> to exercise the local binary.</p>
+clarity git pull
+clarity docker build</code></pre>
+        <p>
+          Clarity só envolve o comando e formata o output. Nada de shims mágicos, nada de build
+          step secreto.
+        </p>
       </section>
 
-      <section class="section">
-        <h2>Share the calm</h2>
-        <div class="social-preview">
-          <article class="social-preview__card">
-            <h3>Optimized social preview</h3>
-            <p>GitHub Pages now ships with Open Graph + Twitter tags so links render a clean banner when shared anywhere.</p>
-            <ul>
-              <li>Uses the repo banner at <code>assets/clarity-banner.png</code>.</li>
-              <li>Auto-fills title, description, and canonical URL.</li>
-              <li>Looks sharp on Slack, Discord, iMessage, and Twitter.</li>
-            </ul>
-          </article>
-          <article class="social-preview__mock">
-            <h4>clarity npm install</h4>
-            <p>✔ Install complete · 42 muted lines</p>
-            <div class="social-preview__meta">
-              <span>Profiles: calm / devops</span>
-              <span>Logs saved · ~/.clarity/logs</span>
+      <section>
+        <h2 class="section-title">Exemplos de uso</h2>
+        <div class="examples">
+          <div class="example-pair">
+            <div class="example-block">
+              <div class="example-label">git pull (original)</div>
+              <code>remote: Enumerating objects...
+From origin/main
+ + 12 files changed, 4 insertions(+), 98 deletions(-)
+Auto-merging src/app.js
+CONFLICT (content): Merge conflict in src/app.js
+error: could not apply ...</code>
             </div>
-          </article>
+            <div class="example-block">
+              <div class="example-label">git pull com Clarity</div>
+              <code>clarity git pull
+
+✓ upstream sincronizado
+! 1 conflito encontrado
+→ abra src/app.js e mantenha a versão da API
+(log salvo em ~/.clarity/logs/...)</code>
+            </div>
+          </div>
+          <div class="example-pair">
+            <div class="example-block">
+              <div class="example-label">docker build (original)</div>
+              <code>[+] Building 142.5s (17/23)
+ => [internal] load build definition from Dockerfile
+ => [2/6] RUN npm install ...
+ => CANCELED
+failed to solve: rpc error: code = Unknown desc = network timeout</code>
+            </div>
+            <div class="example-block">
+              <div class="example-label">docker build com Clarity</div>
+              <code>clarity docker build
+
+✖ build interrompido aos 142s
+! timeout na etapa npm install
+→ tente `--network host` ou valide o proxy
+(use --details para ver o tail do log)</code>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="section">
-        <h2>Ready for your stack</h2>
-        <p>
-          Ship it as an npm package, call <code>node ./bin/clarity</code>, or wrap any command you trust.
-          Tune environment variables like <code>CLARITY_PROFILE</code>, <code>CLARITY_LOGS_DIR</code>,
-          and <code>CLARITY_PAGER</code> to match your workflow.
-        </p>
+      <section>
+        <h2 class="section-title">Filtro anti-ruído</h2>
+        <div class="cta-final">
+          <p>“Se o seu terminal virou uma parede de ruído, o Clarity é o filtro.”</p>
+          <div class="hero-buttons" style="justify-content: center;">
+            <a class="btn btn-primary" href="#instalacao">Instalar agora</a>
+            <a class="btn btn-secondary" href="https://github.com/ruidosujeira/clarity" target="_blank" rel="noreferrer">Repositório</a>
+          </div>
+        </div>
       </section>
 
       <footer>
-        MIT © 2025 · Built by people who prefer calm terminals.
+        Feito por ruidosujeira · OSS — <a href="https://github.com/ruidosujeira/clarity" target="_blank" rel="noreferrer">GitHub</a>
       </footer>
-    </div>
+    </main>
+
+    <script>
+      const tabs = document.querySelectorAll(".terminal-tab");
+      const panels = document.querySelectorAll(".terminal-panel");
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const target = tab.dataset.panel;
+          tabs.forEach((btn) => btn.classList.toggle("active", btn === tab));
+          panels.forEach((panel) => panel.classList.toggle("active", panel.dataset.panel === target));
+        });
+      });
+
+      const navShell = document.querySelector(".nav-shell");
+      const toggleNavGlow = () => {
+        if (window.scrollY > 12) {
+          navShell.classList.add("scrolled");
+        } else {
+          navShell.classList.remove("scrolled");
+        }
+      };
+      toggleNavGlow();
+      window.addEventListener("scroll", toggleNavGlow);
+    </script>
   </body>
 </html>
