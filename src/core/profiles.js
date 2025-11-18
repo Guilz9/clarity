@@ -6,7 +6,8 @@ function cloneSummary(summary) {
     result: summary.result,
     warnings: summary.warnings ? [...summary.warnings] : undefined,
     error: summary.error,
-    nextSteps: summary.nextSteps ? [...summary.nextSteps] : undefined
+    nextSteps: summary.nextSteps ? [...summary.nextSteps] : undefined,
+    block: summary.block
   };
 }
 

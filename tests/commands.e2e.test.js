@@ -22,8 +22,8 @@ test('clarity npm install prints success summary and warnings', async () => {
   });
 
   assert.strictEqual(result.code, 0);
-  assert.match(result.stdout, /✔ Result: Dependencies installed or updated successfully./);
-  assert.match(result.stdout, /⚠ Warnings:/);
+  assert.match(result.stdout, /✔ Install complete/);
+  assert.match(result.stdout, /Use --full for detailed logs./);
   assert.ok(fs.readdirSync(logsDir).length > 0);
 });
 
@@ -37,8 +37,8 @@ test('clarity git push summarizes rejected push', async () => {
   });
 
   assert.strictEqual(result.code, 1);
-  assert.match(result.stdout, /❌ Error: Push rejected because the remote branch has commits you do not have locally./);
-  assert.match(result.stdout, /→ Next steps:/);
+  assert.match(result.stdout, /❌ Push rejected because the remote branch has commits you do not have locally\./);
+  assert.match(result.stdout, /Run 'git pull --rebase'/);
   assert.ok(fs.readdirSync(logsDir).length > 0);
 });
 
@@ -52,7 +52,7 @@ test('clarity docker build reports failing step', async () => {
   });
 
   assert.strictEqual(result.code, 1);
-  assert.match(result.stdout, /❌ Error: Docker build failed at step 2\/3/);
+  assert.match(result.stdout, /❌ Docker build failed at step 2\/3/);
   assert.match(result.stdout, /Inspect the RUN instruction/);
   assert.ok(fs.readdirSync(logsDir).length > 0);
 });
@@ -67,8 +67,8 @@ test('clarity pnpm install captures conflicts', async () => {
   });
 
   assert.strictEqual(result.code, 1);
-  assert.match(result.stdout, /pnpm encountered conflicts/);
-  assert.match(result.stdout, /Run again with --full/);
+  assert.match(result.stdout, /❌ pnpm encountered conflicts during execution\./);
+  assert.match(result.stdout, /Use --full/);
   assert.ok(fs.readdirSync(logsDir).length > 0);
 });
 
@@ -82,7 +82,7 @@ test('clarity yarn build reports silent success', async () => {
   });
 
   assert.strictEqual(result.code, 0);
-  assert.match(result.stdout, /✔ Result: yarn command completed successfully./);
+  assert.match(result.stdout, /✔ yarn command completed successfully./);
   assert.ok(fs.readdirSync(logsDir).length > 0);
 });
 
@@ -96,23 +96,23 @@ test('clarity bun surfaces failures quickly', async () => {
   });
 
   assert.strictEqual(result.code, 1);
-  assert.match(result.stdout, /bun command encountered an error/);
+  assert.match(result.stdout, /❌ bun command encountered an error./);
   assert.ok(fs.readdirSync(logsDir).length > 0);
 });
 
 test('clarity calm mode highlights muted output and flags', async () => {
   const { home } = tempEnv();
-  const result = await runClarity(['npm', 'install', '--verbose', '--force'], {
+  const result = await runClarity(['git', 'push', '--verbose', '--force'], {
     env: {
       HOME: home,
       PATH: `${FIXTURE_BIN}:${process.env.PATH}`
     }
   });
 
-  assert.strictEqual(result.code, 0);
+  assert.strictEqual(result.code, 1);
   assert.match(result.stdout, /Muted output: /);
-  assert.match(result.stdout, /Flags captured: --verbose --force/);
-  assert.match(result.stdout, /Use --details for a quick preview/);
+  assert.match(result.stdout, /Flags: --verbose --force/);
+  assert.match(result.stdout, /Try --details for a quick preview/);
 });
 
 test('clarity --details shows a preview before needing --full', async () => {

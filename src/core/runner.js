@@ -1,5 +1,6 @@
 const { spawn } = require('child_process');
 const { writeLog } = require('../utils/logs');
+const { createBlock, bullets, normalizeItem } = require('../utils/blocks');
 const { getSummary } = require('./plugins');
 const { applyProfile } = require('./profiles');
 
@@ -52,21 +53,37 @@ function printFull({ stdout, stderr }) {
   }
 }
 
-function printSummary(summary) {
-  if (summary.result) {
-    console.log(`✔ Result: ${summary.result}`);
+function printSummary(summary, { profile = 'calm' } = {}) {
+  const meta = { blockPrinted: false };
+  if (!summary) {
+    return meta;
   }
-  if (summary.warnings && summary.warnings.length) {
-    console.log('⚠ Warnings:');
-    summary.warnings.forEach((warn) => console.log(`- ${warn}`));
+
+  if (summary.block) {
+    console.log(summary.block);
+    meta.blockPrinted = true;
   }
-  if (summary.error) {
-    console.log(`❌ Error: ${summary.error}`);
+
+  const showExtras = profile !== 'calm' || !summary.block;
+
+  if (showExtras) {
+    if (summary.result) {
+      console.log(`✔ Result: ${summary.result}`);
+    }
+    if (summary.warnings && summary.warnings.length) {
+      console.log('⚠ Warnings:');
+      summary.warnings.forEach((warn) => console.log(`- ${warn}`));
+    }
+    if (summary.error) {
+      console.log(`❌ Error: ${summary.error}`);
+    }
+    if (summary.nextSteps && summary.nextSteps.length) {
+      console.log('→ Next steps:');
+      summary.nextSteps.forEach((step) => console.log(`- ${step}`));
+    }
   }
-  if (summary.nextSteps && summary.nextSteps.length) {
-    console.log('→ Next steps:');
-    summary.nextSteps.forEach((step) => console.log(`- ${step}`));
-  }
+
+  return meta;
 }
 
 function lineCount(output) {
@@ -131,28 +148,6 @@ function extractFlags(args = []) {
   return args.filter((arg) => arg.startsWith('-'));
 }
 
-function printMutedHint({ stdout, stderr, args }) {
-  const stdoutLines = lineCount(stdout);
-  const stderrLines = lineCount(stderr);
-
-  if (!stdoutLines && !stderrLines) {
-    return;
-  }
-
-  const parts = [
-    `Muted output: ${pluralize('stdout line', stdoutLines)} / ${pluralize('stderr line', stderrLines)} captured.`
-  ];
-
-  const flags = extractFlags(args);
-  if (flags.length) {
-    parts.push(`Flags captured: ${flags.join(' ')}`);
-  }
-
-  parts.push('Use --details for a quick preview or --full to dump the entire log (try --raw to stream live).');
-
-  console.log(parts.join(' '));
-}
-
 async function runClarity({ command, args, options = {} }) {
   const mode = options.raw
     ? 'raw'
@@ -188,15 +183,72 @@ async function runClarity({ command, args, options = {} }) {
 
   const summary = getSummary(context);
   const profiledSummary = applyProfile(context, summary);
+  const formattedSummary = ensureBlock(profiledSummary, context);
 
-  printSummary(profiledSummary);
+  printSummary(formattedSummary, { profile });
   if (mode === 'details') {
     printDetailsPreview({ stdout, stderr });
   }
-  if (mode === 'calm') {
-    printMutedHint({ stdout, stderr, args });
-  }
   return exitCode;
+}
+
+function ensureBlock(summary, ctx) {
+  if (!summary) {
+    return summary;
+  }
+
+  if (summary.block) {
+    return summary;
+  }
+
+  const items = [];
+  if (summary.warnings && summary.warnings.length) {
+    items.push(...bullets(summary.warnings, '•'));
+  }
+  if (summary.nextSteps && summary.nextSteps.length) {
+    items.push(...bullets(summary.nextSteps, '→'));
+  }
+  const mutedLine = buildMutedLine(ctx);
+  if (mutedLine) {
+    items.push(normalizeItem(mutedLine, '→'));
+  }
+
+  const fallbackHeadline = ctx.exitCode === 0
+    ? '✔ Command completed successfully'
+    : '❌ Command failed';
+
+  const headline = summary.error
+    ? `❌ ${summary.error}`
+    : summary.result
+      ? `✔ ${summary.result}`
+      : fallbackHeadline;
+
+  const footer = ctx.exitCode === 0
+    ? 'Use --full for detailed logs.'
+    : 'Use --full to inspect the full log.';
+
+  summary.block = createBlock({ headline, items, footer });
+  return summary;
+}
+
+function buildMutedLine({ stdout, stderr, args }) {
+  const stdoutLines = lineCount(stdout);
+  const stderrLines = lineCount(stderr);
+  if (!stdoutLines && !stderrLines) {
+    return null;
+  }
+
+  const parts = [
+    `Muted output: ${pluralize('stdout line', stdoutLines)} / ${pluralize('stderr line', stderrLines)} captured.`
+  ];
+
+  const flags = extractFlags(args);
+  if (flags.length) {
+    parts.push(`Flags: ${flags.join(' ')}`);
+  }
+
+  parts.push('Try --details for a quick preview.');
+  return parts.join(' ');
 }
 
 module.exports = runClarity;

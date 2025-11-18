@@ -34,8 +34,8 @@ test('npm plugin detects success and deprecated warnings', () => {
     })
   );
 
-  assert.strictEqual(summary.result, 'Dependencies installed or updated successfully.');
-  assert.ok(summary.warnings && summary.warnings[0].includes('deprecated'));
+  assert.ok(summary.block.includes('✔'));
+  assert.ok(summary.block.includes('deprecated package'));
   assert.ok(!summary.error);
 });
 

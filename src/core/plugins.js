@@ -57,7 +57,8 @@ function getSummary(ctx) {
     summary.result ||
       summary.error ||
       (summary.warnings && summary.warnings.length) ||
-      (summary.nextSteps && summary.nextSteps.length)
+      (summary.nextSteps && summary.nextSteps.length) ||
+      summary.block
   );
 
   if (!hasContent && plugin !== genericPlugin) {
