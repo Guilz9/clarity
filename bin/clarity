@@ -8,7 +8,7 @@ const { listLogs, formatEntries, readLogFile } = require('../src/core/logsList')
 function showHelp() {
   const message = `CLΛRITY - minimalist terminal wrapper\n\n` +
     `Usage:\n` +
-    `  clarity <command> [args...] [--full] [--raw] [--profile <name>]\n\n` +
+    `  clarity <command> [args...] [--details] [--full] [--raw] [--profile <name>]\n\n` +
     `Examples:\n` +
     `  clarity npm install\n` +
     `  clarity git push\n` +
@@ -59,6 +59,7 @@ async function main() {
   const rest = argv.slice(1);
 
   const options = {
+    details: false,
     full: false,
     raw: false,
     profile: 'calm'
@@ -74,6 +75,10 @@ async function main() {
     const arg = rest[i];
     if (arg === '--full') {
       options.full = true;
+      continue;
+    }
+    if (arg === '--details') {
+      options.details = true;
       continue;
     }
     if (arg === '--raw') {

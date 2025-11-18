@@ -43,7 +43,7 @@ Already installed globally? run `clarity --help` or `clarity logs --limit 3` to 
 ## Quick usage
 
 ```bash
-clarity <command> [args...] [--full] [--raw] [--profile <name>]
+clarity <command> [args...] [--details] [--full] [--raw] [--profile <name>]
 
 clarity npm install
 clarity --profile devops git push
@@ -54,7 +54,8 @@ clarity logs --editor code --limit 1
 ```
 
 ### Output modes
-- `calm` (default) – only the smart summary.
+- `calm` (default) – only the smart summary, plus a reminder of any muted output/flags.
+- `--details` – summary + a head/tail preview of the captured stdout/stderr (great before jumping to `--full`).
 - `--full` – run, save the log, then dump stdout/stderr at the end.
 - `--raw` – live-stream stdout/stderr while still archiving the log.
 

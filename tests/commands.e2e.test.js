@@ -99,3 +99,34 @@ test('clarity bun surfaces failures quickly', async () => {
   assert.match(result.stdout, /bun command encountered an error/);
   assert.ok(fs.readdirSync(logsDir).length > 0);
 });
+
+test('clarity calm mode highlights muted output and flags', async () => {
+  const { home } = tempEnv();
+  const result = await runClarity(['npm', 'install', '--verbose', '--force'], {
+    env: {
+      HOME: home,
+      PATH: `${FIXTURE_BIN}:${process.env.PATH}`
+    }
+  });
+
+  assert.strictEqual(result.code, 0);
+  assert.match(result.stdout, /Muted output: /);
+  assert.match(result.stdout, /Flags captured: --verbose --force/);
+  assert.match(result.stdout, /Use --details for a quick preview/);
+});
+
+test('clarity --details shows a preview before needing --full', async () => {
+  const { home } = tempEnv();
+  const result = await runClarity(['npm', 'install', '--details'], {
+    env: {
+      HOME: home,
+      PATH: `${FIXTURE_BIN}:${process.env.PATH}`
+    }
+  });
+
+  assert.strictEqual(result.code, 0);
+  assert.match(result.stdout, /Captured output preview/);
+  assert.match(result.stdout, /--- stdout ---/);
+  assert.match(result.stdout, /added 2 packages/);
+  assert.match(result.stdout, /Use --full for the entire log/);
+});
