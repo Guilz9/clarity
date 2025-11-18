@@ -28,6 +28,8 @@ CLΛRITY is a minimalist terminal wrapper. It runs the real command, saves stdou
 ## Installation
 
 ```bash
+npm install -g clarityterm   # instantly exposes the `clarity` command
+
 git clone https://github.com/ruidosujeira/clarity
 cd clarity
 npm install
@@ -35,6 +37,8 @@ npm link   # optional: exposes `clarity` globally while developing
 ```
 
 Without `npm link`, run it via `node ./bin/clarity <command>`.
+
+Already installed globally? run `clarity --help` or `clarity logs --limit 3` to confirm your environment is wired up.
 
 ## Quick usage
 
@@ -111,7 +115,7 @@ The e2e tests rely on fake binaries in `tests/fixtures/bin/*` to guarantee deter
 - The final GIF lives at `assets/clarity-demo.gif`; replace it to refresh the screenshot.
 
 ## Quick roadmap
-- [ ] Publish the npm package (`clarity`) for global installs (`npm i -g clarity`).
+- [x] Publish the npm package (`clarityterm`) for global installs (`npm i -g clarityterm`).
 - [ ] Add `terraform`, `kubectl`, and `ansible` plugins.
 - [ ] Store log metadata to filter by status/profile.
 - [ ] `clarity watch <cmd>` to follow long-running pipelines with incremental summaries.

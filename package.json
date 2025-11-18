@@ -1,9 +1,9 @@
 {
-  "name": "clarity-cli",
+  "name": "clarityterm",
   "version": "0.1.0",
   "description": "CLΛRITY is a minimalist terminal wrapper that summarizes commands and cuts noise.",
   "bin": {
-    "clarity": "./bin/clarity"
+    "clarity": "bin/clarity"
   },
   "scripts": {
     "test": "node --test",
