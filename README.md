@@ -1,7 +1,3 @@
-<div align="center">
-
-<img src="assets/clarity-banner.png" alt="CLARITY banner" width="520" />
-
 > Stop reading walls of logs. Keep only the signal after every command.
 
 [![npm](https://img.shields.io/npm/v/clarityterm?color=cb3837&logo=npm&logoColor=white)](#installation)
